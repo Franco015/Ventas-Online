@@ -1,0 +1,146 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API de Productos - Cliente</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+    }
+    header {
+        background-color: #007bff;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+    }
+    h1 {
+        margin: 0;
+    }
+    section {
+        padding: 2rem;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+    }
+    table, th, td {
+        border: 1px solid #ddd;
+    }
+    th, td {
+        padding: 1rem;
+        text-align: left;
+    }
+    th {
+        background-color: #f1f1f1;
+    }
+    button {
+        padding: 0.5rem 1rem;
+        margin: 0 0.5rem;
+        border: none;
+        background-color: #28a745;
+        color: white;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #218838;
+    }
+    footer {
+        background-color: #007bff;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+    <header>
+        <h1>Gestión de Productos</h1>
+    </header>
+    <section>
+        <h2>Lista de Productos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Descripción</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="producto-list">
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Tienda de Electrónica - Cliente API</p>
+    </footer>
+
+    <script>
+        async function obtenerProductos() {
+            try {
+                const respuesta = await fetch('/api/productos/');
+                const productos = await respuesta.json();
+
+                const productoList = document.getElementById('producto-list');
+                productoList.innerHTML = '';
+
+                productos.forEach(producto => {
+                    const fila = document.createElement('tr');
+
+                    fila.innerHTML = `
+                        <td>${producto.nombre}</td>
+                        <td>${producto.categoria}</td>
+                        <td>$${producto.precio}</td>
+                        <td>${producto.descripcion}</td>
+                        <td>
+                            <button onclick="verDetalle(${producto.id})">Ver</button>
+                            <button onclick="editarProducto(${producto.id})">Editar</button>
+                            <button onclick="eliminarProducto(${producto.id})">Eliminar</button>
+                        </td>
+                    `;
+                    productoList.appendChild(fila);
+                });
+            } catch (error) {
+                console.error('Error al obtener los productos:', error);
+            }
+        }
+
+        function verDetalle(id) {
+            alert('Viendo detalles del producto con ID: ' + id);
+        }
+
+        function editarProducto(id) {
+            alert('Editando el producto con ID: ' + id);
+        }
+
+        async function eliminarProducto(id) {
+            if (confirm('¿Estás seguro de eliminar este producto?')) {
+                try {
+                    const respuesta = await fetch(`/api/productos/${id}/`, {
+                        method: 'DELETE'
+                    });
+                    if (respuesta.ok) {
+                        alert('Producto eliminado exitosamente');
+                        obtenerProductos();
+                    } else {
+                        alert('Error al eliminar el producto');
+                    }
+                } catch (error) {
+                    console.error('Error al eliminar el producto:', error);
+                }
+            }
+        }
+
+        window.onload = obtenerProductos;
+    </script>
+</body>
+</html>
